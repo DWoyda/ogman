@@ -5,6 +5,7 @@ description = "My help to EDA/ML"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = ["pandas>=2.0", "numpy>=1.26"]
+license = {text = "MIT"}
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]
