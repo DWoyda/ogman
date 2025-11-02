@@ -16,11 +16,44 @@ def clean_columns(df: pd.DataFrame,
                   max_len: Optional[int] = None,
                   extra_reserved: Optional[Iterable[str]] = None,
                   return_mapping: bool = False):
+     """
+    Cleans and standardizes DataFrame column names.
+
+    - Removes accents, special characters, and spaces
+    - Converts CamelCase / PascalCase to snake_case
+    - Forces lowercase and ensures uniqueness
+    - Flattens MultiIndex columns (optional)
+    - Optionally saves the column mapping (original → cleaned) to a JSON file
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input DataFrame.
+    overrides : dict, optional
+        Manual rename overrides applied after cleaning.
+    save_map_to : str, optional
+        Path to save the column name mapping as a JSON file.
+    digit_prefix : str, default "col_"
+        Prefix used if a column name starts with a digit.
+    conflict_suffix : str, default "_col"
+        Suffix added if a cleaned name conflicts with reserved names.
+    flatten_multiindex : bool, default True
+        Whether to flatten MultiIndex columns.
+    mi_joiner : str, default "__"
+        Separator used when flattening MultiIndex columns.
+    max_len : int, optional
+        Maximum allowed name length (names will be truncated if longer).
+    extra_reserved : Iterable[str], optional
+        Additional reserved names that cannot be used.
+    return_mapping : bool, default False
+        If True, returns both the cleaned DataFrame and the name mapping.
+
+    Returns
+    -------
+    pd.DataFrame or (pd.DataFrame, dict)
+        Cleaned DataFrame, optionally with the column name mapping.
     """
-    Normalizuje nazwy kolumn do ASCII snake_case, rozbija CamelCase,
-    pozwala na nazwy jak metody/builtins (count/sum/itd.).
-    Rezerwuje tylko 'index' i 'columns'. Gwarantuje unikalność.
-    """
+
 
     def deaccent(s: str) -> str:
         return ''.join(c for c in unicodedata.normalize('NFKD', str(s))
