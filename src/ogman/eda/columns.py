@@ -2,7 +2,7 @@ import re
 import json
 import unicodedata
 from pathlib import Path
-from typing import Optional, Iterable, Tuple, Dict
+from typing import Optional, Iterable, Dict
 import pandas as pd
 
 
@@ -16,7 +16,7 @@ def clean_columns(df: pd.DataFrame,
                   max_len: Optional[int] = None,
                   extra_reserved: Optional[Iterable[str]] = None,
                   return_mapping: bool = False):
-     """
+    """
     Cleans and standardizes DataFrame column names.
 
     - Removes accents, special characters, and spaces
@@ -54,14 +54,15 @@ def clean_columns(df: pd.DataFrame,
         Cleaned DataFrame, optionally with the column name mapping.
     """
 
-
     def deaccent(s: str) -> str:
-        return ''.join(c for c in unicodedata.normalize('NFKD', str(s))
-                       if not unicodedata.combining(c))
+        return ''.join(
+            c for c in unicodedata.normalize('NFKD', str(s))
+            if not unicodedata.combining(c)
+        )
 
     def to_snake(s: str) -> str:
         s = deaccent(s).strip()
-        # Camel/PascalCase -> snake_case (działa też dla akronimów typu ID)
+        # Camel/PascalCase -> snake_case
         s = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', s)
         s = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s)
         s = s.replace('-', '_').replace('/', '_')
@@ -81,20 +82,21 @@ def clean_columns(df: pd.DataFrame,
         cut = max_len - keep_for_suffix
         return name[:max(1, cut)]
 
-    # 0) MultiIndex -> płasko
-    cols_in = ([
-        mi_joiner.join(map(str, t)) for t in df.columns
-    ] if flatten_multiindex and isinstance(df.columns, pd.MultiIndex)
-        else list(map(str, df.columns)))
+    # 0. MultiIndex -> flat
+    cols_in = (
+        [mi_joiner.join(map(str, t)) for t in df.columns]
+        if flatten_multiindex and isinstance(df.columns, pd.MultiIndex)
+        else list(map(str, df.columns))
+    )
 
-    # 1) zastrzeżone (minimalny zestaw)
+    # 1. reserved (minimum set)
     reserved = {"index", "columns"}
     if extra_reserved:
         reserved |= set(map(str, extra_reserved))
 
     mapping, used = {}, set()
 
-    # 2) czyszczenie + antykolizje + unikalność
+    # 2. cleaning + anti-collisions + uniqueness
     for orig, raw in zip(map(str, df.columns), cols_in):
         s = to_snake(raw)
         base = s
@@ -113,7 +115,7 @@ def clean_columns(df: pd.DataFrame,
 
     df2 = df.rename(columns=mapping)
 
-    # 3) overrides (po czyszczeniu)
+    # 3. overrides (after cleaning)
     if overrides:
         cleaned_over = {}
         inv = {v: k for k, v in mapping.items()}

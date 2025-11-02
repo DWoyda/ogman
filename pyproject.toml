@@ -1,11 +1,17 @@
 [project]
 name = "ogman"
 version = "0.1.0"
-description = "My help to EDA/ML"
+description = "OGMAN: Tools for automated EDA and Machine Learning workflows."
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["pandas>=2.0", "numpy>=1.26"]
-license = {text = "MIT"}
+license = { text = "MIT" }
+authors = [
+  { name = "OscarGoldman"}
+    ]
+dependencies = [
+  "pandas>=2.0",
+  "numpy>=1.26"
+]
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]
@@ -16,3 +22,5 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["ogman*"]
+namespaces = false
